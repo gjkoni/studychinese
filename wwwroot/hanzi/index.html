@@ -50,12 +50,12 @@
       left: 0;
       right: 0;
       bottom: 0;
-      z-index: -1;
+      z-index: var(--zindex);
     }
   </style>
 </head>
 
-<body style="--size:300px;">
+<body style="--size:300px; --zindex:-1;">
   <div id="tian" class="tian"></div>
   <div id="completesvg"></div>
   <script src="js/cnchar.min.js"></script>
@@ -67,7 +67,9 @@
     var totalStrokes = 0;
     var chartxt = GetQueryString('text');
     var size = GetQueryString('size');
+    var zindex = chartxt.length > 1 ? -1 : 999;
     document.body.style.setProperty('--size', `${size}px`);
+    document.body.style.setProperty('--zindex', `${zindex}`);
     drawArea.innerHTML = "";
     var option = {
       clear: false,

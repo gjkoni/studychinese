@@ -1,21 +1,24 @@
 import 'dart:async';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 // import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studychinese/common/global.dart';
-import 'package:studychinese/common/str_res_keys.dart';
+// import 'package:studychinese/common/str_res_keys.dart';
+import 'package:studychinese/widgets/search_appbar.dart';
 
+// ignore: must_be_immutable
 class WebPage extends StatefulWidget {
-  final String url;
-  const WebPage({Key? key, required this.url}) : super(key: key);
+  String url;
+  WebPage({Key? key, required this.url}) : super(key: key);
 
   @override
   WebPageState createState() => WebPageState();
@@ -29,35 +32,35 @@ class WebPageState extends State<WebPage> {
   InAppWebViewController? inAppController;
   RxBool err = false.obs;
 
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  // ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  // final Connectivity _connectivity = Connectivity();
+  // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
-  Future<void> initConnectivity() async {
-    late ConnectivityResult result;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      result = await _connectivity.checkConnectivity();
-    } on PlatformException catch (e) {
-      Global.logger.e('Couldn\'t check connectivity status:', e);
-      return;
-    }
+  // Future<void> initConnectivity() async {
+  //   late ConnectivityResult result;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   try {
+  //     result = await _connectivity.checkConnectivity();
+  //   } on PlatformException catch (e) {
+  //     Global.logger.e('Couldn\'t check connectivity status:', e);
+  //     return;
+  //   }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) {
-      return Future.value(null);
-    }
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //   if (!mounted) {
+  //     return Future.value(null);
+  //   }
 
-    return _updateConnectionStatus(result);
-  }
+  //   return _updateConnectionStatus(result);
+  // }
 
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
-    setState(() {
-      _connectionStatus = result;
-    });
-  }
+  // Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+  //   setState(() {
+  //     // _connectionStatus = result;
+  //   });
+  // }
 
   void checkPermisson() async {
     //当前权限
@@ -81,17 +84,23 @@ class WebPageState extends State<WebPage> {
     // 返回权限申请的状态 status
   }
 
+  String setUrl(String text) {
+    // return "http://pandaapi.smartpanda.com.cn/pad/index/$text?size=${ScreenUtil().screenWidth ~/ 3}&cover";
+    return "http://localhost:8080/hanzi/index.html?text=$text&size=${ScreenUtil().screenWidth / (text.length < 5 ? text.length : 5)}&cover";
+    // return "http://localhost:8080/hanzi/index.html";
+  }
+
   @override
   void initState() {
-    initConnectivity();
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    // initConnectivity();
+    // _connectivitySubscription =
+    //     _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     super.initState();
   }
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    // _connectivitySubscription.cancel();
     super.dispose();
   }
 
@@ -99,7 +108,15 @@ class WebPageState extends State<WebPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("写字"),
+        titleSpacing: 0,
+        title: SearchAppBar(
+          hintLabel: "输入想写的字",
+          onSubmitted: (value) {
+            widget.url = setUrl(value);
+            inAppController?.loadUrl(
+                urlRequest: URLRequest(url: WebUri(widget.url)));
+          },
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         shadowColor: Colors.transparent,
