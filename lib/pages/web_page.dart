@@ -108,94 +108,64 @@ class WebPageState extends State<WebPage> {
       body: SafeArea(
         child: Container(
             padding: const EdgeInsets.all(0),
-            child: _connectionStatus == ConnectivityResult.none
-                ? GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      initConnectivity();
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: Center(
-                          child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Text(SR.clickToRetry.tr),
+            child: Stack(
+              children: [
+                InAppWebView(
+                  initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+                  gestureRecognizers: {
+                    Factory(() => VerticalDragGestureRecognizer()),
+                  },
+                  onConsoleMessage: (controller, consoleMessage) {
+                    debugPrint(consoleMessage.message);
+                  },
+                  onWebViewCreated: (controller) {},
+                  onLoadStop: (controller, url) {
+                    inAppController = controller;
+                    // print("网页 onLoadStop--》");
+                  },
+                  onReceivedHttpError: ((controller, request, errorResponse) {
+                    if (kDebugMode) {
+                      print(request.url);
+                      print(errorResponse);
+                    }
+                    err.value = true;
+                  }),
+                  onReceivedError: (controller, request, error) {
+                    if (kDebugMode) {
+                      print('bb  error');
+                    }
+                  },
+                  onReceivedServerTrustAuthRequest:
+                      (controller, challenge) async {
+                    // print("ServerTrust");
+                    //解决 handshake failed问题
+                    return ServerTrustAuthResponse(
+                        action: ServerTrustAuthResponseAction.PROCEED);
+                  },
+                ),
+                Obx(() => Visibility(
+                    visible: err.value,
+                    child: Positioned(
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            err.value = false;
+                            inAppController?.reload();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(0),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 255, 255)),
+                            child: const Center(
+                              child: Text('网页错误'),
+                            ),
                           ),
-                          Image.asset(
-                            "assets/images/nodata.png",
-                            width: 80,
-                            height: 80,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10),
-                            child: Text(SR.noNetwork.tr),
-                          ),
-                        ],
-                      )),
-                    ),
-                  )
-                : Stack(
-                    children: [
-                      InAppWebView(
-                        initialUrlRequest: URLRequest(url: WebUri(widget.url)),
-                        gestureRecognizers: {
-                          Factory(() => VerticalDragGestureRecognizer()),
-                        },
-                        onConsoleMessage: (controller, consoleMessage) {
-                          debugPrint(consoleMessage.message);
-                        },
-                        onWebViewCreated: (controller) {},
-                        onLoadStop: (controller, url) {
-                          inAppController = controller;
-                          // print("网页 onLoadStop--》");
-                        },
-                        onReceivedHttpError:
-                            ((controller, request, errorResponse) {
-                          if (kDebugMode) {
-                            print(request.url);
-                            print(errorResponse);
-                          }
-                          err.value = true;
-                        }),
-                        onReceivedError: (controller, request, error) {
-                          if (kDebugMode) {
-                            print('bb  error');
-                          }
-                        },
-                        onReceivedServerTrustAuthRequest:
-                            (controller, challenge) async {
-                          // print("ServerTrust");
-                          //解决 handshake failed问题
-                          return ServerTrustAuthResponse(
-                              action: ServerTrustAuthResponseAction.PROCEED);
-                        },
-                      ),
-                      Obx(() => Visibility(
-                          visible: err.value,
-                          child: Positioned(
-                              top: 0,
-                              left: 0,
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () {
-                                  err.value = false;
-                                  inAppController?.reload();
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(0),
-                                  decoration: const BoxDecoration(
-                                      color:
-                                          Color.fromARGB(255, 255, 255, 255)),
-                                  child: const Center(
-                                    child: Text('网页错误'),
-                                  ),
-                                ),
-                              ))))
-                    ],
-                  )),
+                        ))))
+              ],
+            )),
       ),
       resizeToAvoidBottomInset: true,
     );
