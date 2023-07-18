@@ -100,6 +100,9 @@ class WebPageState extends State<WebPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("写字"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        shadowColor: Colors.transparent,
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
