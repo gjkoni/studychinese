@@ -24,9 +24,9 @@ class _SearchAppBarState extends State<SearchAppBar> {
   void initState() {
     super.initState();
     //  获取焦点
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _focusNode.requestFocus();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   _focusNode.requestFocus();
+    // });
   }
 
   @override
@@ -49,7 +49,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
         controller: _controller,
         // 自动获取焦点
         focusNode: _focusNode,
-        autofocus: true,
+        //autofocus: true,
         decoration: InputDecoration(
             hintText: widget.hintLabel,
             hintStyle: const TextStyle(color: Colors.grey),
