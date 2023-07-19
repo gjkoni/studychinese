@@ -33,7 +33,13 @@ class HttpServerController extends GetxController {
   Future<shelf.Handler> get handler async {
     final router = shelf_router.Router();
 
-    var path = await copyAssets();
+    var documentDirectory = await getApplicationDocumentsDirectory();
+    String folderPath = documentDirectory.path;
+    var path = '$folderPath/wwwroot';
+    Directory directory = Directory(path);
+    if (!directory.existsSync()) {
+      path = await copyAssets();
+    }
 
     var staticHandler =
         createStaticHandler('$path/hanzi', defaultDocument: 'index.html');
