@@ -160,27 +160,27 @@ class WebPageState extends State<WebPage> {
                         action: ServerTrustAuthResponseAction.PROCEED);
                   },
                 ),
-                // Obx(() => Visibility(
-                //     visible: err.value,
-                //     child: Positioned(
-                //         top: 0,
-                //         left: 0,
-                //         bottom: 0,
-                //         right: 0,
-                //         child: GestureDetector(
-                //           onTap: () {
-                //             err.value = false;
-                //             inAppController?.reload();
-                //           },
-                //           child: Container(
-                //             padding: const EdgeInsets.all(0),
-                //             decoration: const BoxDecoration(
-                //                 color: Color.fromARGB(255, 255, 255, 255)),
-                //             child: const Center(
-                //               child: Text('网页错误'),
-                //             ),
-                //           ),
-                //         ))))
+                Obx(() => Visibility(
+                    visible: err.value,
+                    child: Positioned(
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            err.value = false;
+                            inAppController?.reload();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(0),
+                            decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 255, 255, 255)),
+                            child: const Center(
+                              child: Text('网页错误'),
+                            ),
+                          ),
+                        ))))
               ],
             )),
       ),
