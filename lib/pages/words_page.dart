@@ -37,7 +37,7 @@ class WordsPageState extends State<WordsPage> {
 
   String setUrl(String text) {
     // return "http://pandaapi.smartpanda.com.cn/pad/index/$text?size=${ScreenUtil().screenWidth ~/ 3}&cover";
-    return "http://localhost:8080/hanzi/index.html?text=$text&size=${ScreenUtil().screenWidth / (text.length < 5 ? text.length : 5)}&cover";
+    return "http://localhost:8080/grnchinese/index.html?text=$text&size=${ScreenUtil().screenWidth / (text.length < 5 ? text.length : 5)}&cover";
     // return "http://localhost:8080/hanzi/index.html";
   }
 

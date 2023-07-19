@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.studychinese">
+    package="com.gongjie.studychinese">
 
      <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"  />
     <!-- Remove READ_MEDIA_VIDEO if you don't need to load videos. -->
