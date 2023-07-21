@@ -39,6 +39,7 @@ class HttpServerController extends GetxController {
 
     var documentDirectory = await getApplicationDocumentsDirectory();
     String folderPath = documentDirectory.path;
+    debugPrint(folderPath);
     var root = '$folderPath/wwwroot';
 
     const zipfile = 'https://cdn.smartmicky.com/static/zip/grnchinese.zip';
@@ -141,6 +142,7 @@ class HttpServerController extends GetxController {
     debugPrint('url:$url name:$name');
     var saveFile = File("$root/$name.zip");
     bool isDownSuccess = false;
+    var startTime = DateTime.now();
     if (saveFile.existsSync()) {
       debugPrint('文件已存在');
       isDownSuccess = true;
@@ -150,7 +152,7 @@ class HttpServerController extends GetxController {
         rootDir.createSync();
       }
       saveFile.createSync();
-      var startTime = DateTime.now();
+
       debugPrint('下载文件url:$url');
       try {
         await Dio().download(url, saveFile.path,
@@ -160,37 +162,35 @@ class HttpServerController extends GetxController {
           EasyLoading.showProgress(progress,
               status: '初始加载资源 ${(progress * 100).toStringAsFixed(0)}%',
               maskType: EasyLoadingMaskType.black);
-          if (count >= total) {
-            EasyLoading.dismiss();
-          }
         });
         isDownSuccess = true;
       } catch (e) {
         e.printError();
         debugPrint('下载文件url:$url异常：$e');
-        EasyLoading.dismiss();
-      }
-      var endTime = DateTime.now();
-      var t = endTime.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch;
-      if (isDownSuccess) {
-        EasyLoading.show(status: '解压中...');
-        debugPrint("下载解压时间$t");
-        debugPrint('下载文件url:$url成功');
-        await unZip(saveFile, '$root/$name');
-        debugPrint('解压文件成功');
-        EasyLoading.dismiss();
-      } else {
-        debugPrint('下载文件url:$url失败');
-        Toast.error("下载失败");
+        saveFile.deleteSync();
         EasyLoading.dismiss();
       }
     }
-
+    var endTime = DateTime.now();
+    var t = endTime.millisecondsSinceEpoch - startTime.millisecondsSinceEpoch;
+    if (isDownSuccess) {
+      debugPrint("下载解压时间$t");
+      debugPrint('下载文件url:$url成功');
+      await unZip(saveFile, '$root/$name');
+      debugPrint('解压文件成功');
+    } else {
+      debugPrint('下载文件url:$url失败');
+      Toast.error("下载失败");
+      EasyLoading.dismiss();
+    }
     return isDownSuccess;
   }
 
   unZip(file, unzipName) async {
+    EasyLoading.dismiss();
+    EasyLoading.showInfo('正在解压资源中...', maskType: EasyLoadingMaskType.black);
     await extractFileToDisk(file.path, unzipName);
+    EasyLoading.dismiss();
   }
 
   @override

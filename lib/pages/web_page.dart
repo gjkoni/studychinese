@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 // import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,7 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studychinese/common/global.dart';
+import 'package:studychinese/common/toast.dart';
 // import 'package:studychinese/common/str_res_keys.dart';
 import 'package:studychinese/widgets/search_appbar.dart';
 
@@ -77,6 +79,99 @@ class WebPageState extends State<WebPage> {
     }
   }
 
+  void addJavascriptHandler(InAppWebViewController controller) {
+    controller.addJavaScriptHandler(
+        handlerName: 'closeView',
+        callback: (args) {
+          // print arguments coming from the JavaScript side!
+          debugPrint(args.toString());
+          Get.back(result: args[0]);
+          // return data to the JavaScript side!
+          // return {'bar': 'bar_value', 'baz': 'baz_value'};
+          sp.remove("openurl");
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'appToastInfo',
+        callback: (args) {
+          Toast.info(args[0]);
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'appToastError',
+        callback: (args) {
+          // print arguments coming from the JavaScript side!
+          Toast.error(args[0]);
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'killoff', callback: (args) {});
+    controller.addJavaScriptHandler(
+        handlerName: 'getAppUAT', callback: (args) {});
+    controller.addJavaScriptHandler(
+        handlerName: "openFile",
+        callback: (args) async {
+          // var fileurl = args[0]["file"];
+          // var title = args[0]["title"];
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'openWebview',
+        callback: (args) async {
+          // var url = args[0]["url"];
+
+          // if (sp.getString("openurl") == null ||
+          //     sp.getString("openurl") != url) {
+          //   sp.setString("openurl", url);
+
+          // var returnData = await Get.to(page, preventDuplicates: false);
+          // if (returnData != null) {
+          //   sp.remove("openurl");
+          //   var json = jsonEncode(returnData);
+          //   // print(json);
+          //   inAppController?.evaluateJavascript(source: 'setParams($json)');
+          // }
+          // }
+        });
+    controller.addJavaScriptHandler(
+        handlerName: "getDeviceInfo",
+        callback: (args) {
+          // var data = {'statusBarHeight': ScreenUtil().statusBarHeight};
+          // return data;
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'routeApp',
+        callback: (args) {
+          // if (args[0]["router"].toString() == "product") {
+
+          // }
+        });
+    controller.addJavaScriptHandler(
+        handlerName: 'appAction',
+        callback: (args) {
+          if (args[0]["actionName"] == 'saveCharTestData') {
+            var char = args[0]['params']['char'];
+            var unicode = char.codeUnits[0].toRadixString(16);
+            var key = 'char_$unicode';
+            var listKey = 'list_$unicode';
+            if (!sp.containsKey(key)) {
+              sp.setInt(key, args[0]['params']['code']);
+              sp.setStringList(listKey, [jsonEncode(args[0]['params'])]);
+            } else {
+              var keyCode = sp.getInt(key);
+              if (keyCode != 1) {
+                sp.setString(key, args[0]['params']['code']);
+              }
+              var list = sp.getStringList(listKey);
+              list?.add(jsonEncode(args[0]['params']));
+              sp.setStringList(listKey, list!);
+            }
+            var debugList = sp.getStringList(listKey);
+            debugPrint(jsonEncode(debugList));
+            debugPrint(args.toString());
+            controller.evaluateJavascript(
+                source:
+                    'window.webAction("webAction", {"args": "${args.toString()}"})');
+          }
+        });
+  }
+
   void requestPermiss(Permission permission) async {
     //发起权限申请
     // PermissionStatus status = await permission.request();
@@ -120,6 +215,17 @@ class WebPageState extends State<WebPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         shadowColor: Colors.transparent,
+        actions: [
+          GestureDetector(
+            onTap: () => {inAppController?.reload()},
+            child: Container(
+              padding: const EdgeInsets.all(0),
+              // decoration: const BoxDecoration(color: Colors.black),
+              width: 60,
+              child: const Icon(Icons.refresh),
+            ),
+          )
+        ],
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -129,13 +235,20 @@ class WebPageState extends State<WebPage> {
               children: [
                 InAppWebView(
                   initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+                  initialSettings: InAppWebViewSettings(
+                    mediaPlaybackRequiresUserGesture: false,
+                    useHybridComposition: true,
+                    allowsInlineMediaPlayback: true,
+                  ),
                   gestureRecognizers: {
                     Factory(() => VerticalDragGestureRecognizer()),
                   },
                   onConsoleMessage: (controller, consoleMessage) {
                     debugPrint(consoleMessage.message);
                   },
-                  onWebViewCreated: (controller) {},
+                  onWebViewCreated: (controller) {
+                    addJavascriptHandler(controller);
+                  },
                   onLoadStop: (controller, url) {
                     inAppController = controller;
                     // print("网页 onLoadStop--》");
