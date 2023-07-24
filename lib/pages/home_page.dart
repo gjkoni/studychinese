@@ -10,6 +10,7 @@ import 'package:studychinese/common/str_res_keys.dart';
 import 'package:studychinese/constants/color_constant.dart';
 import 'package:studychinese/constants/constant.dart';
 import 'package:studychinese/controllers/http_server_controller.dart';
+import 'package:studychinese/pages/level_page.dart';
 import 'package:studychinese/pages/settings_page.dart';
 import 'package:studychinese/pages/words_page.dart';
 
@@ -30,6 +31,7 @@ class HomePageState extends State<HomePage> {
 
   final List<Map> _pages = [
     {"key": "words", "page": const WordsPage()},
+    {"key": "custom", "page": const LevelPage()},
     {"key": "settings", "page": const SettingsPage()},
   ];
 
@@ -44,6 +46,16 @@ class HomePageState extends State<HomePage> {
           color: ColorConstant.colorTheme,
         ),
         label: SR.words.tr),
+    BottomNavigationBarItem(
+        icon: const Icon(
+          IconData(0xeb6a, fontFamily: 'aliIcons'),
+          color: ColorConstant.colorGray138,
+        ),
+        activeIcon: const Icon(
+          IconData(0xeb6a, fontFamily: 'aliIcons'),
+          color: ColorConstant.colorTheme,
+        ),
+        label: SR.custom.tr),
     BottomNavigationBarItem(
         icon: const Icon(
           IconData(0xe78e, fontFamily: 'aliIcons'),

@@ -15,6 +15,7 @@ void main() {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+  Global.initDB();
   Global.initLogger();
   Global.initPreferences().then((value) {
     ErrorWidget.builder = (detail) => Container(

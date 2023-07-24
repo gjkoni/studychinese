@@ -6,6 +6,7 @@ class StringRes extends Translations {
   Map<String, Map<String, String>> get keys => {
         'zh_CN': {
           SR.words: "字词",
+          SR.custom: "自定义",
           SR.settings: "设置",
           SR.clickTwiceInSuccessionToExitTheApplication: "连续点击两次退出应用",
           SR.noNetwork: "没有网络",
@@ -13,6 +14,7 @@ class StringRes extends Translations {
         },
         'en_US': {
           SR.words: "Words",
+          SR.custom: "custom",
           SR.settings: "Settings",
           SR.clickTwiceInSuccessionToExitTheApplication:
               "Click twice in succession to exit the application",

@@ -1,0 +1,13 @@
+CREATE TABLE LevelCharacter (
+    id INT NOT NULL PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    character TEXT NOT NULL,
+    admin INTEGER NOT NULL,
+    isdelete INTEGER NOT NULL
+);
+
+CREATE INDEX LevelCharacter_name ON LevelCharacter(title);
+
+createEntry: INSERT INTO LevelCharacter (title, character, admin, isdelete) VALUES (:title, :character, 0, 0);
+deleteById: UPDATE LevelCharacter set isdelete=1 WHERE id = :id;
+allLevelCharacter: SELECT * FROM LevelCharacter where isdelete=0;
