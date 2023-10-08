@@ -71,7 +71,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     httpServerController = Get.put(HttpServerController());
-    SystemChrome.setSystemUIOverlayStyle(Constant.appUiOverlayStyle);
+    // SystemChrome.setSystemUIOverlayStyle(Constant.appUiOverlayStyle);
     super.initState();
   }
 
@@ -119,7 +119,7 @@ class HomePageState extends State<HomePage> {
               currentIndex: _currentPage,
               selectedFontSize: 14,
               unselectedFontSize: 14,
-              type: BottomNavigationBarType.fixed,
+              // type: BottomNavigationBarType.fixed,
               onTap: (int index) {
                 // _pageController.jumpToPage(index);
                 setState(() {

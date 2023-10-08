@@ -78,6 +78,7 @@ class StudyChineseAppState extends State<StudyChineseApp>
   Widget build(BuildContext context) {
     return ScreenUtilInit(
         designSize: const Size(390, 844),
+        ensureScreenSize: true,
         minTextAdapt: true,
         splitScreenMode: true,
         builder: (context, child) {
