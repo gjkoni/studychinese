@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:studychinese/common/global.dart';
 import 'package:studychinese/db/db_manager.dart';
+import 'package:studychinese/pages/web_page.dart';
 
 class LevelPage extends StatefulWidget {
   const LevelPage({super.key});
@@ -25,6 +27,12 @@ class LevelPageState extends State<LevelPage> {
 
   void queryData() {
     db.allLevelCharacter().get().then((value) => {list.value = value});
+  }
+
+  String setUrl(String text) {
+    // return "http://pandaapi.smartpanda.com.cn/pad/index/$text?size=${ScreenUtil().screenWidth ~/ 3}&cover";
+    return "http://localhost:8080/hanzi/index.html?text=$text&size=${ScreenUtil().screenWidth / (text.length < 5 ? text.length : 5)}&cover";
+    // return "http://localhost:8080/hanzi/index.html";
   }
 
   Widget buildLevelList(RxList<LevelCharacterData> list) {
@@ -70,7 +78,9 @@ class LevelPageState extends State<LevelPage> {
                                 ],
                               ));
                     },
-                    onTap: () {},
+                    onTap: () {
+                      Get.to(() => WebPage(url: setUrl(e.character)));
+                    },
                     child: Container(
                       padding: const EdgeInsets.only(
                           left: 10, right: 10, top: 10, bottom: 10),

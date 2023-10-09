@@ -10,36 +10,36 @@ import 'common/global.dart';
 // import 'pages/provider/provider_test1.dart';
 // import 'pages/provider/user_model.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   Global.initDB();
   Global.initLogger();
-  Global.initPreferences().then((value) {
-    ErrorWidget.builder = (detail) => Container(
-          alignment: Alignment.center,
-          child: Text(detail.exceptionAsString()),
-        );
+  await Global.initPreferences();
 
-    // runApp(Provider<UserModel>(
-    //   create: (_) => UserModel(),
-    //   child: const MaterialApp(
-    //     debugShowCheckedModeBanner: false,
-    //     home: ProviderExample(),
-    //   ),
-    // ));
+  ErrorWidget.builder = (detail) => Container(
+        alignment: Alignment.center,
+        child: Text(detail.exceptionAsString()),
+      );
 
-    runApp(const StudyChineseApp());
+  // runApp(Provider<UserModel>(
+  //   create: (_) => UserModel(),
+  //   child: const MaterialApp(
+  //     debugShowCheckedModeBanner: false,
+  //     home: ProviderExample(),
+  //   ),
+  // ));
 
-    if (Platform.isAndroid) {
-      //设置android状态栏为透明
-      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: Colors.transparent,
-      ));
-    }
-  });
+  runApp(const StudyChineseApp());
+
+  if (Platform.isAndroid) {
+    //设置android状态栏为透明
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.black,
+    ));
+  }
 }

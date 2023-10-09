@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'common/global.dart';
 import 'common/route_get.dart';
 import 'common/string_res.dart';
-import 'pages/home_page.dart';
+// import 'pages/home_page.dart';
 
 class StudyChineseApp extends StatefulWidget {
   const StudyChineseApp({super.key});
@@ -84,9 +84,9 @@ class StudyChineseAppState extends State<StudyChineseApp>
         builder: (context, child) {
           return GetMaterialApp(
             debugShowCheckedModeBanner: false,
+            initialRoute: RouteGet.home,
             title: '学写字',
             builder: EasyLoading.init(),
-            // initialRoute: RouteGet.home,
             getPages: RouteGet.getPages,
             locale: View.of(context).platformDispatcher.locale,
             translations: StringRes(),
@@ -94,8 +94,6 @@ class StudyChineseAppState extends State<StudyChineseApp>
             theme: ThemeData(
               primarySwatch: Colors.blue,
             ),
-
-            home: const HomePage(),
           );
         });
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studychinese/common/toast.dart';
@@ -9,6 +10,7 @@ import 'package:studychinese/common/global.dart';
 import 'package:studychinese/common/str_res_keys.dart';
 import 'package:studychinese/constants/color_constant.dart';
 import 'package:studychinese/constants/constant.dart';
+// import 'package:studychinese/constants/constant.dart';
 import 'package:studychinese/controllers/http_server_controller.dart';
 import 'package:studychinese/pages/level_page.dart';
 import 'package:studychinese/pages/settings_page.dart';
@@ -71,7 +73,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     httpServerController = Get.put(HttpServerController());
-    // SystemChrome.setSystemUIOverlayStyle(Constant.appUiOverlayStyle);
+    SystemChrome.setSystemUIOverlayStyle(Constant.appUiOverlayStyle);
     super.initState();
   }
 
@@ -119,7 +121,7 @@ class HomePageState extends State<HomePage> {
               currentIndex: _currentPage,
               selectedFontSize: 14,
               unselectedFontSize: 14,
-              // type: BottomNavigationBarType.fixed,
+              type: BottomNavigationBarType.fixed,
               onTap: (int index) {
                 // _pageController.jumpToPage(index);
                 setState(() {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 //import 'dart:convert';
 import 'dart:io';
 // import 'package:archive/archive_io.dart';
@@ -8,6 +9,7 @@ import 'dart:io';
 import 'package:archive/archive_io.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 //import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -28,8 +30,8 @@ class HttpServerController extends GetxController {
 
   @override
   void onInit() {
-    debugPrint('启动服务器');
-    EasyLoading.init();
+    // debugPrint('启动服务器');
+    // EasyLoading.init();
     startShelfServer();
     super.onInit();
   }
@@ -42,13 +44,15 @@ class HttpServerController extends GetxController {
     debugPrint(folderPath);
     var root = '$folderPath/wwwroot';
 
-    const zipfile = 'https://cdn.smartmicky.com/static/zip/grnchinese.zip';
-    const zipname = 'grnchinese';
+    // const zipfile = 'https://cdn.smartmicky.com/static/zip/grnchinese.zip';
+    const zipname = 'hanzi';
     var path = '$root/$zipname';
     Directory directory = Directory(path);
     if (!directory.existsSync()) {
-      // path = await copyAssets();
-      await downFile(zipfile, zipname, root);
+      path = await copyAssets();
+      // EasyLoading.showToast("初始化完成将重启", duration: const Duration(seconds: 3));
+      // Future.delayed(const Duration(seconds: 3), () => Restart.restartApp());
+      //await downFile(zipfile, zipname, root);
     }
 
     var staticHandler =
@@ -64,43 +68,43 @@ class HttpServerController extends GetxController {
     return router;
   }
 
-  // static Future<String> copyAssets() async {
-  //   EasyLoading.show(maskType: EasyLoadingMaskType.black);
-  //   int now = DateTime.now().millisecondsSinceEpoch;
+  static Future<String> copyAssets() async {
+    // EasyLoading.show(status: '初始化', maskType: EasyLoadingMaskType.black);
+    // int now = DateTime.now().millisecondsSinceEpoch;
 
-  //   var documentDirectory = await getApplicationDocumentsDirectory();
-  //   String folderPath = documentDirectory.path;
-  //   final manifestContent = await rootBundle.loadString('AssetManifest.json');
-  //   final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+    var documentDirectory = await getApplicationDocumentsDirectory();
+    String folderPath = documentDirectory.path;
+    final manifestContent = await rootBundle.loadString('AssetManifest.json');
+    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
-  //   final assetList = manifestMap.keys
-  //       .where((String key) => key.startsWith('wwwroot'))
-  //       .toList();
+    final assetList = manifestMap.keys
+        .where((String key) => key.startsWith('wwwroot'))
+        .toList();
 
-  //   for (final asset in assetList) {
-  //     if (!asset.contains('.DS_Store')) {
-  //       await copyAsset(asset, folderPath);
-  //     }
-  //   }
-  //   EasyLoading.dismiss();
+    for (final asset in assetList) {
+      if (!asset.contains('.DS_Store')) {
+        await copyAsset(asset, folderPath);
+      }
+    }
+    // EasyLoading.dismiss();
 
-  //   debugPrint('移动文件耗时 = ${DateTime.now().millisecondsSinceEpoch - now}毫秒');
-  //   return '$folderPath/wwwroot';
-  // }
+    // debugPrint('移动文件耗时 = ${DateTime.now().millisecondsSinceEpoch - now}毫秒');
+    return '$folderPath/wwwroot';
+  }
 
-  // static Future<File> copyAsset(String assetName, String localPath) async {
-  //   int lastSeparatorIndex = assetName.lastIndexOf('/');
-  //   Directory directory = Directory(
-  //       '$localPath${Platform.pathSeparator}${assetName.substring(0, lastSeparatorIndex)}');
+  static Future<File> copyAsset(String assetName, String localPath) async {
+    int lastSeparatorIndex = assetName.lastIndexOf('/');
+    Directory directory = Directory(
+        '$localPath${Platform.pathSeparator}${assetName.substring(0, lastSeparatorIndex)}');
 
-  //   if (!directory.existsSync()) directory.createSync(recursive: true);
-  //   ByteData data = await rootBundle.load(assetName);
-  //   Uint8List bytes = data.buffer.asUint8List();
+    if (!directory.existsSync()) directory.createSync(recursive: true);
+    ByteData data = await rootBundle.load(assetName);
+    Uint8List bytes = data.buffer.asUint8List();
 
-  //   final file = File('$localPath${Platform.pathSeparator}$assetName');
-  //   await file.writeAsBytes(bytes);
-  //   return file;
-  // }
+    final file = File('$localPath${Platform.pathSeparator}$assetName');
+    await file.writeAsBytes(bytes);
+    return file;
+  }
 
   Future<void> startShelfServer() async {
     final server = await io.serve(await handler, 'localhost', 8080);
