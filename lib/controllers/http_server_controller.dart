@@ -6,6 +6,7 @@ import 'dart:io';
 // import 'package:dio/dio.dart';
 // import 'package:flutter/cupertino.dart';
 // import 'package:flutter/services.dart';
+// import 'package:archive/archive_io.dart';
 import 'package:archive/archive_io.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -161,7 +162,7 @@ class HttpServerController extends GetxController {
       try {
         await Dio().download(url, saveFile.path,
             onReceiveProgress: (int count, int total) {
-          debugPrint('下载进度count:$count total:$total');
+          // debugPrint('下载进度count:$count total:$total');
           progress = count / total;
           EasyLoading.showProgress(progress,
               status: '初始加载资源 ${(progress * 100).toStringAsFixed(0)}%',
@@ -190,10 +191,22 @@ class HttpServerController extends GetxController {
     return isDownSuccess;
   }
 
-  unZip(file, unzipName) async {
+  unZip(file, unzipName) {
     EasyLoading.dismiss();
     EasyLoading.showInfo('正在解压资源中...', maskType: EasyLoadingMaskType.black);
-    await extractFileToDisk(file.path, unzipName);
+    debugPrint('unzippath:${file.path}');
+    // final inputStream = InputFileStream(file.path);
+    // final archive = ZipDecoder().decodeBuffer(inputStream);
+    // extractArchiveToDisk(archive, unzipName);
+    extractFileToDisk(file.path, unzipName);
+    // final zipFile = File(file.path);
+    // final destinationDir = Directory(unzipName);
+    // try {
+    //   ZipFile.extractToDirectory(
+    //       zipFile: zipFile, destinationDir: destinationDir);
+    // } catch (e) {
+    //   debugPrint(e.toString());
+    // }
     EasyLoading.dismiss();
   }
 

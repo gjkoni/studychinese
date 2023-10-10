@@ -48,7 +48,7 @@ android {
 //        applicationId "com.gongjie.studychinese"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 19
+        minSdkVersion 33
         // targetSdkVersion flutter.targetSdkVersion
         targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
@@ -56,10 +56,32 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix '_debug'
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            manifestPlaceholders = [ buildType:"(debug)" ]
+            ndk{
+                abiFilters "arm64-v8a" //"arm64-v8a","x86" //, 'armeabi','x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            }
+        }
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
+            // lintOptions {
+            //     checkReleaseBuilds false
+            //     abortOnError false
+            // }
             signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            manifestPlaceholders = [ buildType:"" ]
+            ndk{
+                //abiFilters "armeabi", "armeabi-v7a", "arm64-v8a"  //"arm64-v8a","x86"
+                abiFilters "arm64-v8a" 
+            }
         }
     }
     namespace 'com.gongjie.studychinese'
