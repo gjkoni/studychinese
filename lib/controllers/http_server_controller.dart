@@ -44,15 +44,15 @@ class HttpServerController extends GetxController {
     debugPrint(folderPath);
     var root = '$folderPath/wwwroot';
 
-    // const zipfile = 'https://cdn.smartmicky.com/static/zip/grnchinese.zip';
-    const zipname = 'hanzi';
+    const zipfile = 'https://cdn.smartmicky.com/static/zip/grnchinese.zip';
+    const zipname = 'grnchinese';
     var path = '$root/$zipname';
     Directory directory = Directory(path);
     if (!directory.existsSync()) {
-      path = await copyAssets();
+      // path = await copyAssets();
       // EasyLoading.showToast("初始化完成将重启", duration: const Duration(seconds: 3));
       // Future.delayed(const Duration(seconds: 3), () => Restart.restartApp());
-      //await downFile(zipfile, zipname, root);
+      await downFile(zipfile, zipname, root);
     }
 
     var staticHandler =
