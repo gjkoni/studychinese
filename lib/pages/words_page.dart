@@ -52,7 +52,10 @@ class WordsPageState extends State<WordsPage> {
               decoration: const BoxDecoration(color: ColorConstant.colorWhite),
               child: GestureDetector(
                 onTap: () {
-                  Get.to(() => WebPage(url: setUrl(element)));
+                  Get.to(() => WebPage(
+                        url: setUrl(element),
+                        overScrollAlways: true,
+                      ));
                 },
                 child: Center(
                   child: Text(
@@ -114,7 +117,9 @@ class WordsPageState extends State<WordsPage> {
                       onPressed: () {
                         if (_charactersInputController.text.isNotEmpty) {
                           Get.to(() => WebPage(
-                              url: setUrl(_charactersInputController.text)));
+                                url: setUrl(_charactersInputController.text),
+                                overScrollAlways: true,
+                              ));
                         } else {
                           Toast.error("请输入想写的字词");
                         }

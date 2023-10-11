@@ -20,7 +20,9 @@ import 'package:studychinese/widgets/search_appbar.dart';
 // ignore: must_be_immutable
 class WebPage extends StatefulWidget {
   String url;
-  WebPage({Key? key, required this.url}) : super(key: key);
+  bool? overScrollAlways;
+  WebPage({Key? key, required this.url, bool? overScrollAlways = false})
+      : super(key: key);
 
   @override
   WebPageState createState() => WebPageState();
@@ -180,9 +182,7 @@ class WebPageState extends State<WebPage> {
   }
 
   String setUrl(String text) {
-    // return "http://pandaapi.smartpanda.com.cn/pad/index/$text?size=${ScreenUtil().screenWidth ~/ 3}&cover";
-    return "http://localhost:8080/grnchinese/index.html?text=$text&size=${ScreenUtil().screenWidth / (text.length < 5 ? text.length : 5)}&cover";
-    // return "http://localhost:8080/hanzi/index.html";
+    return "http://localhost:8080/grnchinese/index.html?text=$text&size=${ScreenUtil().screenWidth}&cover";
   }
 
   @override
@@ -201,103 +201,115 @@ class WebPageState extends State<WebPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: SearchAppBar(
-          hintLabel: "输入想写的字",
-          onSubmitted: (value) {
-            widget.url = setUrl(value);
-            inAppController?.loadUrl(
-                urlRequest: URLRequest(url: WebUri(widget.url)));
-          },
+    return WillPopScope(
+      //forbidden swipe in iOS(my ThemeData(platform: TargetPlatform.iOS,)
+      onWillPop: () async {
+        if (Navigator.of(context).userGestureInProgress) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          titleSpacing: 0,
+          title: SearchAppBar(
+            hintLabel: "输入想写的字",
+            onSubmitted: (value) {
+              widget.url = setUrl(value);
+              inAppController?.loadUrl(
+                  urlRequest: URLRequest(url: WebUri(widget.url)));
+            },
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          shadowColor: Colors.transparent,
+          actions: [
+            GestureDetector(
+              onTap: () => {inAppController?.reload()},
+              child: Container(
+                padding: const EdgeInsets.all(0),
+                // decoration: const BoxDecoration(color: Colors.black),
+                width: 60,
+                child: const Icon(Icons.refresh),
+              ),
+            )
+          ],
         ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        shadowColor: Colors.transparent,
-        actions: [
-          GestureDetector(
-            onTap: () => {inAppController?.reload()},
-            child: Container(
+        body: SafeArea(
+          child: Container(
               padding: const EdgeInsets.all(0),
-              // decoration: const BoxDecoration(color: Colors.black),
-              width: 60,
-              child: const Icon(Icons.refresh),
-            ),
-          )
-        ],
-      ),
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Container(
-            padding: const EdgeInsets.all(0),
-            child: Stack(
-              children: [
-                InAppWebView(
-                  initialUrlRequest: URLRequest(url: WebUri(widget.url)),
-                  initialSettings: InAppWebViewSettings(
-                    mediaPlaybackRequiresUserGesture: false,
-                    useHybridComposition: true,
-                    allowsInlineMediaPlayback: true,
+              child: Stack(
+                children: [
+                  InAppWebView(
+                    initialUrlRequest: URLRequest(url: WebUri(widget.url)),
+                    initialSettings: InAppWebViewSettings(
+                        mediaPlaybackRequiresUserGesture: false,
+                        useHybridComposition: true,
+                        allowsInlineMediaPlayback: true,
+                        overScrollMode: widget.overScrollAlways ?? false
+                            ? OverScrollMode.ALWAYS
+                            : OverScrollMode.IF_CONTENT_SCROLLS),
+                    gestureRecognizers: {
+                      Factory(() => VerticalDragGestureRecognizer()),
+                    },
+                    onConsoleMessage: (controller, consoleMessage) {
+                      debugPrint(consoleMessage.message);
+                    },
+                    onWebViewCreated: (controller) {
+                      addJavascriptHandler(controller);
+                    },
+                    onLoadStop: (controller, url) {
+                      inAppController = controller;
+                      // print("网页 onLoadStop--》");
+                    },
+                    onReceivedHttpError: ((controller, request, errorResponse) {
+                      if (kDebugMode) {
+                        print(request.url);
+                        print(errorResponse);
+                      }
+                      err.value = true;
+                    }),
+                    onReceivedError: (controller, request, error) {
+                      if (kDebugMode) {
+                        print('bb  error');
+                      }
+                    },
+                    onReceivedServerTrustAuthRequest:
+                        (controller, challenge) async {
+                      // print("ServerTrust");
+                      //解决 handshake failed问题
+                      return ServerTrustAuthResponse(
+                          action: ServerTrustAuthResponseAction.PROCEED);
+                    },
                   ),
-                  gestureRecognizers: {
-                    Factory(() => VerticalDragGestureRecognizer()),
-                  },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    debugPrint(consoleMessage.message);
-                  },
-                  onWebViewCreated: (controller) {
-                    addJavascriptHandler(controller);
-                  },
-                  onLoadStop: (controller, url) {
-                    inAppController = controller;
-                    // print("网页 onLoadStop--》");
-                  },
-                  onReceivedHttpError: ((controller, request, errorResponse) {
-                    if (kDebugMode) {
-                      print(request.url);
-                      print(errorResponse);
-                    }
-                    err.value = true;
-                  }),
-                  onReceivedError: (controller, request, error) {
-                    if (kDebugMode) {
-                      print('bb  error');
-                    }
-                  },
-                  onReceivedServerTrustAuthRequest:
-                      (controller, challenge) async {
-                    // print("ServerTrust");
-                    //解决 handshake failed问题
-                    return ServerTrustAuthResponse(
-                        action: ServerTrustAuthResponseAction.PROCEED);
-                  },
-                ),
-                Obx(() => Visibility(
-                    visible: err.value,
-                    child: Positioned(
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            err.value = false;
-                            inAppController?.reload();
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(0),
-                            decoration: const BoxDecoration(
-                                color: Color.fromARGB(255, 255, 255, 255)),
-                            child: const Center(
-                              child: Text('网页错误'),
+                  Obx(() => Visibility(
+                      visible: err.value,
+                      child: Positioned(
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: () {
+                              err.value = false;
+                              inAppController?.reload();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(0),
+                              decoration: const BoxDecoration(
+                                  color: Color.fromARGB(255, 255, 255, 255)),
+                              child: const Center(
+                                child: Text('网页错误'),
+                              ),
                             ),
-                          ),
-                        ))))
-              ],
-            )),
+                          ))))
+                ],
+              )),
+        ),
+        resizeToAvoidBottomInset: true,
       ),
-      resizeToAvoidBottomInset: true,
     );
   }
 }

@@ -30,9 +30,7 @@ class LevelPageState extends State<LevelPage> {
   }
 
   String setUrl(String text) {
-    // return "http://pandaapi.smartpanda.com.cn/pad/index/$text?size=${ScreenUtil().screenWidth ~/ 3}&cover";
     return "http://localhost:8080/grnchinese/index.html?text=$text&size=${ScreenUtil().screenWidth}&cover";
-    // return "http://localhost:8080/hanzi/index.html";
   }
 
   Widget buildLevelList(RxList<LevelCharacterData> list) {
@@ -79,7 +77,10 @@ class LevelPageState extends State<LevelPage> {
                               ));
                     },
                     onTap: () {
-                      Get.to(() => WebPage(url: setUrl(e.character)));
+                      Get.to(() => WebPage(
+                            url: setUrl(e.character),
+                            overScrollAlways: true,
+                          ));
                     },
                     child: Container(
                       padding: const EdgeInsets.only(
